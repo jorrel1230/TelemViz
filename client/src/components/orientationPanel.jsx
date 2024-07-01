@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import OrientationModel from './orientationModel';
+import axios from 'axios'
 
 function OrientationPanel() {
 
@@ -7,14 +8,17 @@ function OrientationPanel() {
 
     useEffect(() => {
         const fetchData = async () => {
-            const response = await fetch('./data.json');
-            const result = await response.json();
-            setData(result);
+            axios.get('http://localhost:5000/data')
+                .then((response) => {
+                    console.log(response.data.rotation)
+                    setData(response.data)
+                })
+                .catch((err) => console.log(err))
         };
 
         fetchData();
 
-        const intervalId = setInterval(fetchData); // Fetch data every 5 seconds
+        const intervalId = setInterval(fetchData, 0.01); 
 
         return () => clearInterval(intervalId); // Clean up interval on component unmount
     }, []);

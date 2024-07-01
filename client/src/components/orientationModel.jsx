@@ -11,11 +11,7 @@ const ModelPrimitive = (props) => {
     
     const ref = useRef();
 
-
-    //console.log(rot);
-
-
-    useFrame((state, delta) => {
+    useFrame(() => {
         ref.current.rotation.x = props.rot[0];
         ref.current.rotation.y = props.rot[1];
         ref.current.rotation.z = props.rot[2];
