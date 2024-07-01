@@ -16,7 +16,14 @@ def update_json_file(file_path, key, value):
 i = 0
 while 1:
     i += 0.01
-    update_json_file("../client/public/data.json", "x", i)
-    update_json_file("../client/public/data.json", "y", i)
-    update_json_file("../client/public/data.json", "z", i)
-    time.sleep(0.1)
+    data = {
+        "rotation": {
+            "x":i,
+            "y":i,
+            "z":i
+        }
+    }
+    with open("../client/public/data.json", 'w') as f:
+        json.dump(data, f)
+
+    time.sleep(0.01)
