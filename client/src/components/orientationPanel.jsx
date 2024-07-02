@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
 import OrientationModel from './orientationModel';
-import axios from 'axios'
 
 function OrientationPanel() {
 
     // Initial quaternion data
     const [quaternionData, setQuaternionData] = useState([0, 0, 0, 1]);
-    console.log(quaternionData);
 
     // Function to fetch quaternion data from the API
     const fetchQuaternionData = async () => {
@@ -28,7 +26,7 @@ function OrientationPanel() {
         fetchQuaternionData();
 
         // Set up an interval to fetch data every 5 seconds
-        const intervalId = setInterval(fetchQuaternionData, 0.1);
+        const intervalId = setInterval(fetchQuaternionData, 50);
 
         // Clean up the interval on unmount
         return () => clearInterval(intervalId);
@@ -40,12 +38,16 @@ function OrientationPanel() {
             p-[20px] m-7 rounded-lg'>
 
                 <OrientationModel quaternionData={quaternionData}/>
-                <div className="font-roboto text-xl">
-                    <p>X Rotation: {quaternionData.x || 0}</p>
-                    <p>Y Rotation: {quaternionData.y || 0}</p>
-                    <p>Z Rotation: {quaternionData.z || 0}</p>
-                    <p>W Rotation: {quaternionData.w || 0}</p>
-                    <button onClick={fetchQuaternionData}>Update Quaternion Data</button>
+                <div className="font-roboto text-xl font-semibold text-[#D3D3D3] p-3">
+                    <p>Pitch: {((2 * Math.atan2( 1 + 2 * (quaternionData[3] * quaternionData[1] - quaternionData[0] * quaternionData[2]),
+                                               1 - 2 * (quaternionData[3] * quaternionData[1] - quaternionData[0] * quaternionData[2]))
+                                - 1.570796)*57.2957795).toFixed(5)}</p>
+
+                    <p>Yaw: {((Math.atan2( 2 * (quaternionData[3] * quaternionData[2] + quaternionData[0] * quaternionData[1]),
+                                         1 - 2 * (quaternionData[1] * quaternionData[1] - quaternionData[2] * quaternionData[2])))*57.2957795).toFixed(5)}</p>
+
+                    <p>Roll: {((Math.atan2( 2 * (quaternionData[3] * quaternionData[0] + quaternionData[1] * quaternionData[2]),
+                                          1 - 2 * (quaternionData[0] * quaternionData[0] + quaternionData[1] * quaternionData[1])))*57.2957795).toFixed(5)}</p>
                 </div>
                 
         </div>

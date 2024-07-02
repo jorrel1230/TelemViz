@@ -60,8 +60,10 @@ test = {
 
 # Program Microcontroller Access in this function.
 def fetch_data():
-    test["yaw"] += 0.01
-    test["pitch"] += 0.02
+    test["yaw"] += 0
+    test["pitch"] += 0
+    test["roll"] += 0.003
+
 
 k = ThreadJob(fetch_data,event,0.01)
 k.start()
@@ -88,14 +90,12 @@ def get_gyro_rand_quaternion():
     sy = sin(test["yaw"] * 0.5)
 
     q = {}
-    q["w"] = cr * cp * cy + sr * sp * sy;
-    q["x"] = sr * cp * cy - cr * sp * sy;
-    q["y"] = cr * sp * cy + sr * cp * sy;
-    q["z"] = cr * cp * sy - sr * sp * cy;
+    q["w"] = round(cr * cp * cy + sr * sp * sy, 8)
+    q["x"] = round(sr * cp * cy - cr * sp * sy, 8)
+    q["y"] = round(cr * sp * cy + sr * cp * sy, 8)
+    q["z"] = round(cr * cp * sy - sr * sp * cy, 8)
 
     return jsonify(q)
-
-
 
 if __name__ == '__main__':
     app.run(debug=True)
