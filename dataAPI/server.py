@@ -1,10 +1,27 @@
 from flask import Flask, jsonify, request
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
+import random
+from math import cos, sin
 
 import json
 
 data = {
-    "rotation": { "x": 59.11, "y": 59.11, "z": 59.11 }
+    "gyro": {
+        "quaternion": {
+            "x": 0, 
+            "y": 0, 
+            "z": 0,
+            "w": 1
+        }
+    },
+    "barometer": {
+        "altitude": 1000,
+    },
+    "gps": {
+        "latitude": 0,
+        "longitude": 0,
+        "altitude": 1001,
+    }
 }
 
 
@@ -33,22 +50,51 @@ class ThreadJob(threading.Thread):
 
 event = threading.Event()
 
+test = {
+    "roll": 0,
+    "pitch": 0,
+    "yaw": 0
+}
+
+
+
+# Program Microcontroller Access in this function.
 def fetch_data():
-    data["rotation"]["x"] += 0.01
-    data["rotation"]["y"] += 0.01
-    data["rotation"]["z"] += 0.01
+    test["yaw"] += 0.01
+    test["pitch"] += 0.02
 
 k = ThreadJob(fetch_data,event,0.01)
 k.start()
 
+
+# Data API Here
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-# Route to fetch the JSON data
-@app.route('/data', methods=['GET'])
-def get_data():
-    return jsonify(data)
+
+@app.route('/gyro/quaternion', methods=['GET'])
+def get_gyro_quaternion():
+    #print(data["gyro"]["quaternion"])
+    return jsonify(data["gyro"]["quaternion"])
+
+@app.route('/gyro/rand_quaternion', methods=['GET'])
+def get_gyro_rand_quaternion():
+    cr = cos(test["roll"] * 0.5)
+    sr = sin(test["roll"] * 0.5)
+    cp = cos(test["pitch"] * 0.5)
+    sp = sin(test["pitch"] * 0.5)
+    cy = cos(test["yaw"] * 0.5)
+    sy = sin(test["yaw"] * 0.5)
+
+    q = {}
+    q["w"] = cr * cp * cy + sr * sp * sy;
+    q["x"] = sr * cp * cy - cr * sp * sy;
+    q["y"] = cr * sp * cy + sr * cp * sy;
+    q["z"] = cr * cp * sy - sr * sp * cy;
+
+    return jsonify(q)
+
 
 
 if __name__ == '__main__':

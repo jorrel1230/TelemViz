@@ -4,48 +4,52 @@ import axios from 'axios'
 
 function OrientationPanel() {
 
-    const [data, setData] = useState(null);
+    // Initial quaternion data
+    const [quaternionData, setQuaternionData] = useState([0, 0, 0, 1]);
+    console.log(quaternionData);
+
+    // Function to fetch quaternion data from the API
+    const fetchQuaternionData = async () => {
+        try {
+            const response = await fetch('http://localhost:5000/gyro/rand_quaternion');
+            const data = await response.json();
+            const q = [data.x, data.y, data.z, data.w]
+            setQuaternionData(q);
+            
+        } catch (error) {
+            console.error('Error fetching quaternion data:', error);
+        }
+    };
+
+    
 
     useEffect(() => {
-        const fetchData = async () => {
-            axios.get('http://localhost:5000/data')
-                .then((response) => {
-                    console.log(response.data.rotation)
-                    setData(response.data)
-                })
-                .catch((err) => console.log(err))
-        };
+        // Fetch data immediately on mount
+        fetchQuaternionData();
 
-        fetchData();
+        // Set up an interval to fetch data every 5 seconds
+        const intervalId = setInterval(fetchQuaternionData, 0.1);
 
-        const intervalId = setInterval(fetchData, 0.01); 
-
-        return () => clearInterval(intervalId); // Clean up interval on component unmount
+        // Clean up the interval on unmount
+        return () => clearInterval(intervalId);
     }, []);
 
-
-    if (data) {
-        return (
+    return (
         <div className='w-[300px] h-[720px] 
             bg-gradient-to-br from-zinc-700 to-zinc-700 
             p-[20px] m-7 rounded-lg'>
 
-                <OrientationModel rot={[data.rotation.x || 0, 
-                                        data.rotation.y || 0, 
-                                        data.rotation.z || 0]}/>
+                <OrientationModel quaternionData={quaternionData}/>
                 <div className="font-roboto text-xl">
-                    <p>X Rotation: {data.rotation.x || 0}</p>
-                    <p>Y Rotation: {data.rotation.y || 0}</p>
-                    <p>Z Rotation: {data.rotation.z || 0}</p>
+                    <p>X Rotation: {quaternionData.x || 0}</p>
+                    <p>Y Rotation: {quaternionData.y || 0}</p>
+                    <p>Z Rotation: {quaternionData.z || 0}</p>
+                    <p>W Rotation: {quaternionData.w || 0}</p>
+                    <button onClick={fetchQuaternionData}>Update Quaternion Data</button>
                 </div>
-
-                
                 
         </div>
-        );
-    }
+    );
 }
 
 export default OrientationPanel;
-
-
