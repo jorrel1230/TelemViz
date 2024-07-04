@@ -12,3 +12,4 @@ Step 2: Turn on Frontend Locally
   - npm install
   - npm run preview
   
+Note: This Dashboard is not deployable. It can only be run locally as the backend requires a physical connection.
