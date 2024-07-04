@@ -6,6 +6,7 @@ Step 1: Turn on Backend Locally
   - Run server.py
       -> python3 server.py (MacOS)
       -> python server.py (Windows)
+    
 Step 2: Turn on Frontend Locally
   - cd ./client
   - npm install
