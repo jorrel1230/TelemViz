@@ -1,0 +1,21 @@
+.panel {
+    width: 275px;
+    height: 365px;
+    background-color: #333333;
+    padding: 20px;
+    margin-top: 20px;
+    margin-left: 20px;
+    border-radius: 8px;
+    font-family: "Roboto Mono", monospace;
+    font-size: 1.25rem /* 20px */;
+    line-height: 1.75rem /* 28px */;
+    font-weight: 300;
+    color: #a0a0a0 /* #a0a0a0 */;
+    border-color: #e77500 /* #e77500 */;
+    border-width: 1px;
+}
+
+.panel h1 {
+    font-weight: 350;
+    color: #ffffff /* #a0a0a0 */;
+}

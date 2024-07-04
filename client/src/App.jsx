@@ -5,6 +5,7 @@ import StatusPanel from './components/statusPanel';
 import TemperaturePanel from './components/temperaturePanel';
 import GPSPanel from './components/gpsPanel';
 import AltitudePanel from './components/altitudePanel';
+import MagnetometerPanel from './components/magnetometerPanel';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <TemperaturePanel />
         <GPSPanel />
         <PressurePanel />
+        <MagnetometerPanel />
       </div>
       
       

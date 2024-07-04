@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
-import OrientationModel from './orientationPanelSubComponents/orientationModel';
+import OrientationModel from './subcomponents/orientationModel';
+import './panel.css';
 
 function OrientationPanel() {
 
     // Initial quaternion data
-    const [quaternionData, setQuaternionData] = useState([0, 0, 0, 1]);
+    const [quaternionData, setQuaternionData] = useState([-999, -999, -999, -999]);
 
     // Function to fetch quaternion data from the API
     const fetchQuaternionData = async () => {
         try {
-            const response = await fetch('http://localhost:5000/gyro/rand_quaternion');
+            const response = await fetch('http://localhost:5000/imu/gyro/quaternion');
             const data = await response.json();
             const q = [data.x, data.y, data.z, data.w]
             setQuaternionData(q);
@@ -25,32 +26,23 @@ function OrientationPanel() {
         // Fetch data immediately on mount
         fetchQuaternionData();
 
-        // Set up an interval to fetch data every 0 MILLIseconds
-        const intervalId = setInterval(fetchQuaternionData, 0);
+        // Set up an interval to fetch data every 50 MILLIseconds
+        const intervalId = setInterval(fetchQuaternionData);
 
         // Clean up the interval on unmount
         return () => clearInterval(intervalId);
     }, []);
 
     return (
-        <div className='w-[300px] h-[720px] 
-            bg-[#333333] 
-            p-[20px] m-7 rounded-lg
-            font-roboto text-xl font-light text-[#A0A0A0]
-            border-[#E77500] border'>
+        <div className='panel w-[300px] h-[750px]'>
 
             <h1>Orientation Data</h1>
 
             <OrientationModel quaternionData={quaternionData}/>
-            <p>Pitch: {((2 * Math.atan2( 1 + 2 * (quaternionData[3] * quaternionData[1] - quaternionData[0] * quaternionData[2]),
-                                        1 - 2 * (quaternionData[3] * quaternionData[1] - quaternionData[0] * quaternionData[2]))
-                        - 1.570796)*57.2957795).toFixed(5)}°</p>
-
-            <p>Yaw: {((Math.atan2( 2 * (quaternionData[3] * quaternionData[2] + quaternionData[0] * quaternionData[1]),
-                                    1 - 2 * (quaternionData[1] * quaternionData[1] - quaternionData[2] * quaternionData[2])))*57.2957795).toFixed(5)}°</p>
-
-            <p>Roll: {((Math.atan2( 2 * (quaternionData[3] * quaternionData[0] + quaternionData[1] * quaternionData[2]),
-                                    1 - 2 * (quaternionData[0] * quaternionData[0] + quaternionData[1] * quaternionData[1])))*57.2957795).toFixed(5)}°</p>
+            <p>x: {quaternionData[0].toFixed(4)}</p>
+            <p>y: {quaternionData[1].toFixed(4)}</p>
+            <p>z: {quaternionData[2].toFixed(4)}</p>
+            <p>w: {quaternionData[3].toFixed(4)}</p>
         
         </div>
     );
