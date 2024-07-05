@@ -24,7 +24,7 @@ const OrientationModel = ({quaternionData}) => {
 
     // Set camera position
     camera.position.x = 0;
-    camera.position.z = 500;
+    camera.position.z = 300;
     camera.position.y = 0;
 
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -57,7 +57,7 @@ const OrientationModel = ({quaternionData}) => {
 
     { // Load the OBJ file
     const loader = new OBJLoader();
-    loader.load('./beastC.obj',
+    loader.load('./rocket.obj',
       (object) => {
         objModelRef.current = object;
         scene.add(objModelRef.current);
