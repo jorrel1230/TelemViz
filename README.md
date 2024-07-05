@@ -4,10 +4,14 @@
 ![image](https://github.com/jorrel1230/TelemViz/assets/140212785/ee5bc9dd-2b41-4b2e-adc0-dd92ee457098)
 
 Step 1: Turn on Backend Locally
-  - cd ./server 
+  - cd ./server
+  - Create Python Virtual Env (Only need to do once per machine)
+      -> python -m venv venv
   - Activate Python Virtual Env
       -> source ./venv/bin/activate (MacOS)
       -> ./venv/Scripts/activate (Windows)
+  - Install Dependencies into Virtual Env (Only need to do once per machine)
+      -> pip install -r ./requirements.txt
   - Run server.py
       -> python3 server.py (MacOS)
       -> python server.py (Windows)
