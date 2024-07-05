@@ -36,7 +36,7 @@ function GPSPanel() {
 
 
     return (
-        <div className='panel'>
+        <div className='panel relative'>
 
             <h1>GPS Data</h1>
 
@@ -51,6 +51,12 @@ function GPSPanel() {
                     </Marker>
                 ))}
             </MapContainer>
+            <div className="absolute bottom-2 text-sm w-[250px] text-white">
+                <p>LAT: {locationData.latitude.toFixed(7)}</p>
+                <p>LNG: {locationData.longitude.toFixed(7)}</p>
+                <p>ALT: {locationData.altitude.toFixed(7)}</p>
+            </div>
+            
 
         </div>
     );
