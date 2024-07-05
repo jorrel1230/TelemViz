@@ -32,8 +32,8 @@ data = {
     },
     "temperature": 30,
     "gps": {
-        "latitude": 40.34871084405939, 
-        "longitude": -74.65934104726473,
+        "latitude": 40.3487108, 
+        "longitude": -74.6593410,
         "altitude": -2,
     },
     "status": {
@@ -113,6 +113,9 @@ def fetch_data():
 
     data["gps"]["latitude"] += math.sin(t/2) * 0.00005
     data["gps"]["longitude"] += math.cos(t/2) * 0.00005
+
+    round(data["gps"]["latitude"], 7)
+    round(data["gps"]["longitude"], 7)
 
     
 
