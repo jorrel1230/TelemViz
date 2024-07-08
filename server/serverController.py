@@ -1,7 +1,7 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 import serial
-ser = serial.Serial('/dev/cu.usbserial-0001', 115200, timeout=1)
+ser = serial.Serial('COM3', 115200, timeout=1)
 
 stages = ["PAD", "BOOST", "COAST", "DROGUE", "MAIN"]
 
