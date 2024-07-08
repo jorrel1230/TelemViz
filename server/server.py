@@ -130,6 +130,10 @@ cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 
+@app.route('/data', methods=['GET'])
+def get_data():
+    return jsonify(data)
+
 @app.route('/status', methods=['GET'])
 def get_status():
     return jsonify(data["status"])
