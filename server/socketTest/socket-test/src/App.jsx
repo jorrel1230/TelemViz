@@ -1,7 +1,4 @@
 import { useEffect, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
 
 function App() {
 
@@ -12,27 +9,28 @@ function App() {
     const ws = new WebSocket('ws://localhost:8765');
 
     ws.onopen = () => {
-        //console.log('WebSocket connection established');
+        console.log('WebSocket connection established');
     };
   
     ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
         setDataStr(JSON.stringify(data, null, 2));
+        //console.log(event.data);
     };
   
     ws.onclose = () => {
-        //console.log('WebSocket connection closed');
+        console.log('WebSocket connection closed');
     };
   
     ws.onerror = (error) => {
-        //console.log('WebSocket error:', error);
+        console.log('WebSocket error:', error);
     };
   }, [])
 
   return (
-    <div className="">
+    <pre>
       {dataStr}
-    </div>
+    </pre>
   )
 }
 

@@ -2,47 +2,23 @@ import { useState, useEffect } from "react";
 import './panel.css';
 import QuadGraph from "./subcomponents/quadGraph";
 
-function AccelerationPanel() {
+function AccelerationPanel({ accel, time }) {
 
-    const start_time = Date.now()
-
-    // Initial quaternion data
+    // Initial acceleration data
     const init_data = Array(125).fill({t: -999, x:-999, y:-999, z:-999, net:-999})
     const [accData, setAccData] = useState({t: -999, x:-999, y:-999, z:-999, net:-999});
     const [gData, setgData] = useState(init_data);
 
-    // Function to fetch quaternion data from the API
-    const fetchAccData = async () => {
-        try {
-            const response = await fetch('http://localhost:5000/imu/accelerometer');
-            const data = await response.json();
-            data.t = Math.round((Date.now() - start_time)/1000);
-            setAccData(data);        
-            setgData(prevData => {
-                const newData = [...prevData];
-                newData.shift();
-                newData.push(data);
-                return newData
-            });
-
-        } catch (error) {
-            console.error('Error fetching Accelerometer data:', error);
-        }
-
-    };
-
-    
-
     useEffect(() => {
-        // Fetch data immediately on mount
-        fetchAccData();
-
-        // Set up an interval to fetch data every 0 MILLIseconds
-        const intervalId = setInterval(fetchAccData, 67);
-
-        // Clean up the interval on unmount
-        return () => clearInterval(intervalId);
-    }, []);
+        accel.t = time
+        setAccData(accel)
+        setgData(prevData => {
+            const newData = [...prevData];
+            newData.shift();
+            newData.push(accel);
+            return newData
+        });
+    }, [accel]);
 
     return (
         <div className='panel relative'>

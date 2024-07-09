@@ -3,30 +3,13 @@ import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
-function GPSPanel() {
+function GPSPanel({ gps }) {
 
     const [locationData, setLocationData] = useState({latitude:0, longitude:0, altitude:0});
 
-    const fetchGpsData = async () => {
-        try {
-            const response = await fetch('http://localhost:5000/gps');
-            const data = await response.json();
-            setLocationData(data);     
-        } catch (error) {
-            console.error('Error fetching GPS data:', error);
-        }
-    }
-
     useEffect(() => {
-        // Fetch data immediately on mount
-        fetchGpsData();
-
-        // Set up an interval to fetch data every 0 MILLIseconds
-        const intervalId = setInterval(fetchGpsData, 67);
-
-        // Clean up the interval on unmount
-        return () => clearInterval(intervalId);
-    }, []);
+        setLocationData(gps);
+    }, [gps]);
 
     function ChangeView({ center }) {
         const map = useMap();

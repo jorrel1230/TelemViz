@@ -3,47 +3,24 @@ import './panel.css';
 import { LineChart, Line, CartesianGrid, XAxis, YAxis } from 'recharts';
 
 
-function AltitudePanel() {
+function AltitudePanel({ gpsAlt, barAlt, time}) {
 
-    const start_time = Date.now()
-
-    // Initial quaternion data
+    // Initial altitude data
     const init_data = Array(125).fill({t: -999, gps:-999, barometer:-999})
     const [altData, setAltData] = useState({t: -999, gps:-999, barometer:-999});
     const [gData, setgData] = useState(init_data);
-
-    // Function to fetch quaternion data from the API
-    const fetchAltData = async () => {
-        try {
-            const response = await fetch('http://localhost:5000/altitude');
-            const data = await response.json();
-            data.t = Math.round((Date.now() - start_time)/1000);
-            setAltData(data);        
-            setgData(prevData => {
-                const newData = [...prevData];
-                newData.shift();
-                newData.push(data);
-                return newData
-            });
-
-        } catch (error) {
-            console.error('Error fetching Accelerometer data:', error);
-        }
-
-    };
-
     
 
     useEffect(() => {
-        // Fetch data immediately on mount
-        fetchAltData();
+        setAltData({t: time, gps:gpsAlt, barometer:barAlt});        
+        setgData(prevData => {
+            const newData = [...prevData];
+            newData.shift();
+            newData.push(altData);
+            return newData
+        });
 
-        // Set up an interval to fetch data every 0 MILLIseconds
-        const intervalId = setInterval(fetchAltData, 67);
-
-        // Clean up the interval on unmount
-        return () => clearInterval(intervalId);
-    }, []);
+    }, [gpsAlt, barAlt]);
 
     return (
         <div className='panel relative'>

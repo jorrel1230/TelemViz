@@ -1,8 +1,13 @@
-from flask import Flask, jsonify, request
-from flask_cors import CORS
-import math
+import asyncio
+import websockets
+import json
 import time
+import serial
 
+ser = serial.Serial('COM3', 115200, timeout=1)
+time.sleep(1)
+
+stages = ["PAD", "BOOST", "COAST", "DROGUE", "MAIN"]
 data = {
     "imu": {
         "gyro": {
@@ -32,8 +37,8 @@ data = {
     },
     "temperature": 30,
     "gps": {
-        "latitude": 40.3487108, 
-        "longitude": -74.6593410,
+        "latitude": 40.34871084405939, 
+        "longitude": -74.65934104726473,
         "altitude": -2,
     },
     "status": {
@@ -45,11 +50,7 @@ data = {
     }
 }
 
-
-# Fetching Data from Source
-
 import threading
-
 class ThreadJob(threading.Thread):
     def __init__(self,callback,event,interval):
         '''runs the callback function after interval seconds
@@ -68,112 +69,55 @@ class ThreadJob(threading.Thread):
     def run(self):
         while not self.event.wait(self.interval):
             self.callback()
-
 event = threading.Event()
-
 
 # Program Microcontroller Access in this function.
 def fetch_data():
-    if (time.localtime().tm_sec % 2 == 0):
-        data["status"]["gps"] = True
-        data["status"]["imu"] = False
-        data["status"]["barometer"] = True
-    else:
-        data["status"]["gps"] = False
-        data["status"]["imu"] = True
-        data["status"]["barometer"] = False
+    d = ser.readline().decode(errors='ignore').split(',')
 
-    t = time.time()
+    if len(d) == 24:
+        data["imu"]["gyro"]["quaternion"]["x"] = float(d[0])
+        data["imu"]["gyro"]["quaternion"]["y"] = float(d[1])
+        data["imu"]["gyro"]["quaternion"]["z"] = float(d[2])
+        data["imu"]["gyro"]["quaternion"]["w"] = float(d[3])
 
-    data["imu"]["gyro"]["quaternion"]["w"] = math.sin(t) * 0.816496581
-    data["imu"]["gyro"]["quaternion"]["y"] = math.cos(t) 
-    data["imu"]["gyro"]["quaternion"]["z"] = -math.sin(t) * 0.577350269
+        data["imu"]["accelerometer"]["x"] = float(d[4])
+        data["imu"]["accelerometer"]["y"] = float(d[5])
+        data["imu"]["accelerometer"]["z"] = float(d[6])
+        data["imu"]["accelerometer"]["net"] = float(d[7])
 
-    
-    data["imu"]["accelerometer"]["x"] = math.cos(t) * 0.81649658092
-    data["imu"]["accelerometer"]["y"] = math.sin(t) 
-    data["imu"]["accelerometer"]["z"] = math.cos(t + 1/2) * 0.57735026919
-    data["imu"]["accelerometer"]["net"] = math.sqrt(data["imu"]["accelerometer"]["x"] * data["imu"]["accelerometer"]["x"] 
-                                           + data["imu"]["accelerometer"]["y"] * data["imu"]["accelerometer"]["y"] 
-                                           + data["imu"]["accelerometer"]["z"] * data["imu"]["accelerometer"]["z"])
-    
+        data["imu"]["magnetometer"]["x"] = float(d[8])
+        data["imu"]["magnetometer"]["y"] = float(d[9])
+        data["imu"]["magnetometer"]["z"] = float(d[10])
+        data["imu"]["magnetometer"]["net"] = float(d[11])
 
-    data["imu"]["magnetometer"]["x"] = math.sin(t/2) * 0.5
-    data["imu"]["magnetometer"]["y"] = math.sin(t/2 + 1.57) * 0.75
-    data["imu"]["magnetometer"]["z"] = math.sin(t/2 + 3.14)
-    data["imu"]["magnetometer"]["net"] = math.sqrt(data["imu"]["magnetometer"]["x"] * data["imu"]["magnetometer"]["x"] 
-                                           + data["imu"]["magnetometer"]["y"] * data["imu"]["magnetometer"]["y"] 
-                                           + data["imu"]["magnetometer"]["z"] * data["imu"]["magnetometer"]["z"])
-    
-    data["gps"]["altitude"] += 2*abs(math.sin(t/2))
-    data["barometer"]["altitude"] += 2*abs(math.cos(t/2))
+        data["temperature"] = float(d[12])
+        data["barometer"]["altitude"] = float(d[13])
+        data["barometer"]["pressure"] = float(d[14])
 
-    data["temperature"] = math.sin(t/1.5) ** 2 + math.cos(t/1.5)
-    data["barometer"]["pressure"] += math.sin(t/1.5) ** 2 + math.cos(t/1.5)
-
-    data["gps"]["latitude"] += math.sin(t/2) * 0.00005
-    data["gps"]["longitude"] += math.cos(t/2) * 0.00005
-
-    round(data["gps"]["latitude"], 7)
-    round(data["gps"]["longitude"], 7)
-
-    
+        data["gps"]["latitude"] = float(d[15])
+        data["gps"]["longitude"] = float(d[16])
+        data["gps"]["altitude"] = float(d[17])
 
 
-k = ThreadJob(fetch_data,event, 0.01)
+        data["status"]["stage"] = stages[int(d[18])]
+        data["status"]["age"] = int(d[19])
+        data["status"]["gps"] = d[20] == '1'
+        data["status"]["barometer"] = d[21] == '1'
+        data["status"]["imu"] = d[22] == '1'
+
+    #print(data["imu"]["gyro"])
+
+k = ThreadJob(fetch_data, event, 0.001)
 k.start()
 
-
-# Data API Here
-app = Flask(__name__)
-cors = CORS(app)
-app.config['CORS_HEADERS'] = 'Content-Type'
-
-
-@app.route('/data', methods=['GET'])
-def get_data():
-    return jsonify(data)
-
-@app.route('/status', methods=['GET'])
-def get_status():
-    return jsonify(data["status"])
+async def send_data(websocket, path):
+    while True:
+        await websocket.send(json.dumps(data))
+        await asyncio.sleep(0.05)
 
 
-@app.route('/imu/gyro/quaternion', methods=['GET'])
-def get_gyro_quaternion():
-    return jsonify(data["imu"]["gyro"]["quaternion"])
+start_server = websockets.serve(send_data, "localhost", 8765)
 
-
-@app.route('/imu/accelerometer', methods=['GET'])
-def get_acc():
-    return jsonify(data["imu"]["accelerometer"])
-
-@app.route('/imu/magnetometer', methods=['GET'])
-def get_mag():
-    return jsonify(data["imu"]["magnetometer"])
-
-@app.route('/altitude', methods=['GET'])
-def get_alt():
-    alt = {
-        "gps": data["gps"]["altitude"],
-        "barometer": data["barometer"]["altitude"]
-    }
-    return jsonify(alt)
-
-
-@app.route('/temperature', methods=['GET'])
-def get_temp():
-    return jsonify(data["temperature"])
-
-@app.route('/gps', methods=['GET'])
-def get_gps():
-    return jsonify(data["gps"])
-
-@app.route('/barometer/pressure', methods=['GET'])
-def get_pressure():
-    return jsonify(data["barometer"]["pressure"])
-
-if __name__ == '__main__':
-    from waitress import serve
-    serve(app, host="127.0.0.1", port=5000, threads=8)
-    
+asyncio.get_event_loop().run_until_complete(start_server)
+asyncio.get_event_loop().run_forever()

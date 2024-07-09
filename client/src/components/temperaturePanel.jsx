@@ -4,50 +4,22 @@ import SingleGraph from './subcomponents/singleGraph';
 
 
 
-function TemperaturePanel() {
+function TemperaturePanel({ temp, time }) {
 
-    const start_time = Date.now()
-
-    // Initial quaternion data
+    // Initial temperature data
     const init_data = Array(125).fill({t: -999, value:-999})
     const [tempData, setTempData] = useState({t: -999, value:-999});
     const [gData, setgData] = useState(init_data);
-
-    // Function to fetch quaternion data from the API
-    const fetchTempData = async () => {
-        try {
-            const response = await fetch('http://localhost:5000/temperature');
-            const data = await response.json();
-            const d = {
-                value: data, 
-                t: Math.round((Date.now() - start_time)/1000)
-            }
-            setTempData(d);        
-            setgData(prevData => {
-                const newData = [...prevData];
-                newData.shift();
-                newData.push(d);
-                return newData
-            });
-
-        } catch (error) {
-            console.error('Error fetching Temperature data:', error);
-        }
-
-    };
-
     
-
     useEffect(() => {
-        // Fetch data immediately on mount
-        fetchTempData();
-
-        // Set up an interval to fetch data every 0 MILLIseconds
-        const intervalId = setInterval(fetchTempData, 67);
-
-        // Clean up the interval on unmount
-        return () => clearInterval(intervalId);
-    }, []);
+        setTempData({t: time, value: temp});        
+        setgData(prevData => {
+            const newData = [...prevData];
+            newData.shift();
+            newData.push(tempData);
+            return newData
+        });
+    }, [temp]);
 
     return (
         <div className='panel relative'>
