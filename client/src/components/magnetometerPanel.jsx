@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import './panel.css';
 import QuadGraph from "./subcomponents/quadGraph";
 
+
 function MagnetometerPanel({ mag, time }) {
 
     // Initial quaternion data

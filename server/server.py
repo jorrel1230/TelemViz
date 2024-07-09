@@ -3,6 +3,8 @@ import websockets
 import json
 import time
 import serial
+import threading
+
 
 ser = serial.Serial('COM3', 115200, timeout=1)
 time.sleep(1)
@@ -50,7 +52,6 @@ data = {
     }
 }
 
-import threading
 class ThreadJob(threading.Thread):
     def __init__(self,callback,event,interval):
         '''runs the callback function after interval seconds
@@ -74,8 +75,7 @@ event = threading.Event()
 # Program Microcontroller Access in this function.
 def fetch_data():
     d = ser.readline().decode(errors='ignore').split(',')
-
-    if len(d) == 24:
+    try:
         data["imu"]["gyro"]["quaternion"]["x"] = float(d[0])
         data["imu"]["gyro"]["quaternion"]["y"] = float(d[1])
         data["imu"]["gyro"]["quaternion"]["z"] = float(d[2])
@@ -105,6 +105,8 @@ def fetch_data():
         data["status"]["gps"] = d[20] == '1'
         data["status"]["barometer"] = d[21] == '1'
         data["status"]["imu"] = d[22] == '1'
+    except ValueError:
+        pass
 
     #print(data["imu"]["gyro"])
 
@@ -112,8 +114,13 @@ k = ThreadJob(fetch_data, event, 0.001)
 k.start()
 
 async def send_data(websocket, path):
+    print("Connection Opened!")
     while True:
-        await websocket.send(json.dumps(data))
+        try:
+            await websocket.send(json.dumps(data))
+        except:
+            print("Connection Closed.")
+            return
         await asyncio.sleep(0.05)
 
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import './panel.css';
 import QuadGraph from "./subcomponents/quadGraph";
 
+
 function AccelerationPanel({ accel, time }) {
 
     // Initial acceleration data
