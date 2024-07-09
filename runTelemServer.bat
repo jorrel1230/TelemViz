@@ -1,6 +1,6 @@
 @ECHO OFF
 
-TITLE TelemVizClient
+TITLE TelemVizServer
 
 cd ./server
 
