@@ -52,11 +52,11 @@ void setup() {
   data.magZ = 0;
   data.magN = 1;
 
-  data.barA = 0;
+  data.barA = 200;
   data.barP = -999;
   data.barT = 30;
 
-  data.gpsAlt = -2;
+  data.gpsAlt = 0;
   data.gpsLat = 40.3487108;
   data.gpsLng = -74.6593410;
 
@@ -126,8 +126,8 @@ void loop() {
   data.barT = sin(t/1.5)*sin(t/1.5) + cos(t/1.5);
 
   // Update GPS Data
-  data.gpsLat = 40.3487108 + sin(t/2) * 0.00005;
-  data.gpsLng = cos(t/2) * 0.00005 - 74.6593410;
+  data.gpsLat = 40.3487108 + sin(t/2) * 0.005;
+  data.gpsLng = cos(t/2) * 0.005 - 74.6593410;
 
 
   Serial.printf(DATA_FORMAT_STR, data.gyroX, data.gyroY, data.gyroZ, data.gyroW,

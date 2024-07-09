@@ -24,9 +24,7 @@ function GPSPanel({ gps }) {
             <h1>GPS Data</h1>
 
             <MapContainer center={[locationData.latitude, locationData.longitude]} zoom={13} style={{ height: '75%', width: '100%' }}>
-                <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
+                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                 <ChangeView center={[locationData.latitude, locationData.longitude]}/>
                 {[locationData].map((location) => (
                     <Marker key={location.id} position={[location.latitude, location.longitude]}>
@@ -35,8 +33,8 @@ function GPSPanel({ gps }) {
                 ))}
             </MapContainer>
             <div className="absolute bottom-2 text-sm w-[250px] text-white">
-                <p>LAT: {locationData.latitude.toFixed(7)}</p>
-                <p>LNG: {locationData.longitude.toFixed(7)}</p>
+                <p>LAT: {locationData.latitude.toFixed(7)}°</p>
+                <p>LNG: {locationData.longitude.toFixed(7)}°</p>
                 <p>ALT: {locationData.altitude.toFixed(7)}</p>
             </div>
             
