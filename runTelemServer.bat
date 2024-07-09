@@ -4,4 +4,4 @@ TITLE TelemVizServer
 
 cd ./server
 
-.\venv\Scripts\python.exe server.py
+.\venv\Scripts\python.exe serverWin.py
