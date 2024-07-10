@@ -7,6 +7,6 @@ Windows:
   run "runTelem.bat"
 
 MacOS:
-  run "idfk"
+  run "runTelem.sh"
   
 Note: This Dashboard is not deployable. It can only be run locally as the backend requires a physical connection. There's also no internet in the middle of a desert so go figure.
